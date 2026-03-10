@@ -30,46 +30,48 @@
         </p>
     </div>
 
- <script>
-    // Function to get URL parameters
-    function getUrlParameter(name) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name);
-    }
-    
-    // Try to get code from path first, then from query parameter
-    let code = '';
-    
-    // Check if we came from 404 redirect with ?code=
-    const queryCode = getUrlParameter('code');
-    
-    if (queryCode) {
-        code = queryCode;
-    } else {
-        // Try to get from path
+<script>
+    // Get the referral code from the URL
+    function getReferralCode() {
+        // Get the full path
         const path = window.location.pathname;
-        const pathParts = path.split('/');
-        const lastPart = pathParts[pathParts.length - 1];
         
-        // Only use if it's not index.html
-        if (lastPart && lastPart !== 'index.html') {
-            code = lastPart;
+        // Split by / and get the last part
+        const parts = path.split('/');
+        const lastPart = parts[parts.length - 1];
+        
+        // Check if it's a valid code (not index.html)
+        if (lastPart && lastPart !== 'index.html' && lastPart !== '') {
+            return lastPart;
         }
+        
+        // Also check query parameters (for fallback)
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('code');
+    }
+
+    // Get the code
+    const referralCode = getReferralCode();
+    
+    // Display it on the page
+    const codeElement = document.getElementById('referralCode');
+    if (codeElement) {
+        codeElement.textContent = referralCode || 'No Code';
     }
     
-    // Display the code
-    document.getElementById('referralCode').textContent = code || 'ERROR';
-    
-    // Save to localStorage
-    if (code) {
-        localStorage.setItem('writershub_referral', code);
+    // Save to localStorage for the app to read later
+    if (referralCode) {
+        localStorage.setItem('writershub_referral', referralCode);
+        console.log('Saved referral code:', referralCode);
     }
     
-    // Try to open app
+    // Handle the "Open App" link
     document.getElementById('openApp').onclick = function(e) {
         e.preventDefault();
-        if (code) {
-            window.location = 'intent://refer/' + code + '#Intent;scheme=https;package=com.writershub.app;end';
+        if (referralCode) {
+            window.location = 'intent://refer/' + referralCode + '#Intent;scheme=https;package=com.writershub.app;end';
+        } else {
+            alert('No referral code found');
         }
     };
 </script>   
