@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join WritersHub</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .code { font-size: 48px; font-weight: bold; color: #4CAF50; margin: 20px 0; letter-spacing: 5px; }
+        .button { background: #4CAF50; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-size: 18px; margin: 10px 0; }
+        .info { color: #666; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎁 You've Been Referred to WritersHub!</h1>
+        
+        <p>Your referral code is:</p>
+        <div class="code" id="referralCode">LOADING...</div>
+        
+        <p class="info">Download the app to claim your <strong>KES 20 bonus</strong> after completing your first task!</p>
+        
+        <a href="https://play.google.com/store/apps/details?id=com.writershub.app" class="button">
+            📲 Download WritersHub
+        </a>
+        
+        <p style="margin-top: 30px; font-size: 14px; color: #999;">
+            Already have the app? <a href="#" id="openApp">Click here to open</a>
+        </p>
+    </div>
+
+    <script>
+        // Get referral code from URL
+        const path = window.location.pathname;
+        const code = path.split('/').pop();
+        document.getElementById('referralCode').textContent = code;
+        
+        // Save to localStorage
+        localStorage.setItem('writershub_referral', code);
+        
+        // Try to open app
+        document.getElementById('openApp').onclick = function(e) {
+            e.preventDefault();
+            window.location = 'intent://refer/' + code + '#Intent;scheme=https;package=com.writershub.app;end';
+        };
+    </script>
+</body>
+</html>
