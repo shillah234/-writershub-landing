@@ -30,20 +30,48 @@
         </p>
     </div>
 
-    <script>
-        // Get referral code from URL
+ <script>
+    // Function to get URL parameters
+    function getUrlParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+    
+    // Try to get code from path first, then from query parameter
+    let code = '';
+    
+    // Check if we came from 404 redirect with ?code=
+    const queryCode = getUrlParameter('code');
+    
+    if (queryCode) {
+        code = queryCode;
+    } else {
+        // Try to get from path
         const path = window.location.pathname;
-        const code = path.split('/').pop();
-        document.getElementById('referralCode').textContent = code;
+        const pathParts = path.split('/');
+        const lastPart = pathParts[pathParts.length - 1];
         
-        // Save to localStorage
+        // Only use if it's not index.html
+        if (lastPart && lastPart !== 'index.html') {
+            code = lastPart;
+        }
+    }
+    
+    // Display the code
+    document.getElementById('referralCode').textContent = code || 'ERROR';
+    
+    // Save to localStorage
+    if (code) {
         localStorage.setItem('writershub_referral', code);
-        
-        // Try to open app
-        document.getElementById('openApp').onclick = function(e) {
-            e.preventDefault();
+    }
+    
+    // Try to open app
+    document.getElementById('openApp').onclick = function(e) {
+        e.preventDefault();
+        if (code) {
             window.location = 'intent://refer/' + code + '#Intent;scheme=https;package=com.writershub.app;end';
-        };
-    </script>
+        }
+    };
+</script>   
 </body>
 </html>
