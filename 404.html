@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+        // Get the full URL path
+        const path = window.location.pathname;
+        
+        // Extract the referral code (everything after the last /)
+        const code = path.split('/').pop();
+        
+        // Redirect to index.html with the code as a query parameter
+        window.location.href = '/-writershub-landing/index.html?code=' + code;
+    </script>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>
