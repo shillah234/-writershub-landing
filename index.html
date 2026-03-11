@@ -33,82 +33,75 @@
         <p class="note">If the app doesn't open, make sure it's installed and try again</p>
     </div>
 
-<script>
-    // Get the referral code from the URL
-    function getReferralCode() {
-        // Get the full path
-        const path = window.location.pathname;
-        
-        // Split by / and get the last part
-        const parts = path.split('/');
-        const lastPart = parts[parts.length - 1];
-        
-        // Check if it's a valid code (not index.html)
-        if (lastPart && lastPart !== 'index.html' && lastPart !== '') {
-            return lastPart;
+    <script>
+        // Function to get referral code from URL - FIXED VERSION
+        function getReferralCode() {
+            // Get the full path
+            const path = window.location.pathname;
+            console.log("Current path:", path);
+            
+            // Remove leading and trailing slashes and split
+            const cleanPath = path.replace(/^\/|\/$/g, '');
+            console.log("Clean path:", cleanPath);
+            
+            if (cleanPath && cleanPath !== '' && cleanPath !== 'index.html') {
+                // If path has multiple parts, take the last one
+                const parts = cleanPath.split('/');
+                const lastPart = parts[parts.length - 1];
+                console.log("Extracted code:", lastPart);
+                return lastPart;
+            }
+            
+            // Check query parameters as fallback
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryCode = urlParams.get('code');
+            console.log("Query code:", queryCode);
+            return queryCode;
         }
-        
-        // Also check query parameters (for fallback)
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('code');
-    }
 
-    // Get the code
-    const referralCode = getReferralCode();
-    
-    // Display it on the page
-    const codeElement = document.getElementById('referralCode');
-    if (codeElement) {
-        codeElement.textContent = referralCode || 'No Code';
-    }
-    
-    // Save to localStorage for the app to read later
-    if (referralCode) {
-        localStorage.setItem('writershub_referral', referralCode);
-        console.log('Saved referral code:', referralCode);
-    }
-    
-    // Handle the "Open App" link - MULTIPLE METHODS FOR BETTER COMPATIBILITY
-    document.getElementById('openApp').onclick = function(e) {
-        e.preventDefault();
+        // Get and display the code
+        const referralCode = getReferralCode();
+        console.log("Final referral code:", referralCode);
         
-        if (!referralCode) {
-            alert('No referral code found');
-            return;
+        // Display on page
+        const codeElement = document.getElementById('referralCode');
+        if (codeElement) {
+            codeElement.textContent = referralCode || 'No Code';
         }
         
-        // Method 1: Custom scheme (works with our AndroidManifest.xml setup)
-        window.location = 'writershub://refer/' + referralCode;
+        // Save to localStorage if code exists
+        if (referralCode && referralCode !== 'No Code') {
+            localStorage.setItem('writershub_referral', referralCode);
+            console.log('Saved to localStorage:', referralCode);
+        }
         
-        // Method 2: Intent fallback (Android)
-        setTimeout(function() {
-            window.location = 'intent://refer/' + referralCode + 
-                '#Intent;scheme=https;package=com.writershub.app;' +
-                'S.browser_fallback_url=https://shillah234.github.io/-writershub-landing;end';
-        }, 500);
-        
-        // Method 3: Market intent (if app not installed, goes to Play Store)
-        setTimeout(function() {
-            window.location = 'market://details?id=com.writershub.app';
-        }, 1000);
-        
-        return false;
-    };
-    
-    // Auto-try to open app when page loads (if code exists)
-    if (referralCode) {
-        setTimeout(function() {
+        // Handle "Open App" link
+        document.getElementById('openApp').onclick = function(e) {
+            e.preventDefault();
+            
+            if (!referralCode || referralCode === 'No Code') {
+                alert('No referral code found');
+                return;
+            }
+            
+            console.log('Opening app with code:', referralCode);
+            
             // Try custom scheme first
             window.location = 'writershub://refer/' + referralCode;
-        }, 1000);
-    }
-    
-    // Update download button for testing (remove when app is on Play Store)
-    const downloadButton = document.getElementById('downloadButton');
-    if (downloadButton && !downloadButton.href.includes('play.google.com')) {
-        // For testing, you can set a different link here
-        console.log('Download button ready');
-    }
-</script>   
+            
+            // Fallback to intent after a short delay
+            setTimeout(function() {
+                window.location = 'intent://refer/' + referralCode + 
+                    '#Intent;scheme=https;package=com.writershub.app;end';
+            }, 500);
+        };
+        
+        // Auto-try to open app if code exists (optional)
+        if (referralCode && referralCode !== 'No Code') {
+            setTimeout(function() {
+                window.location = 'writershub://refer/' + referralCode;
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
