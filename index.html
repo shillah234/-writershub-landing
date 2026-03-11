@@ -8,8 +8,10 @@
         body { font-family: Arial, sans-serif; text-align: center; padding: 50px 20px; background: #f5f5f5; }
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .code { font-size: 48px; font-weight: bold; color: #4CAF50; margin: 20px 0; letter-spacing: 5px; }
-        .button { background: #4CAF50; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-size: 18px; margin: 10px 0; }
+        .button { background: #4CAF50; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-size: 18px; margin: 10px 0; border: none; cursor: pointer; }
+        .button:hover { background: #45a049; }
         .info { color: #666; margin: 20px 0; }
+        .note { font-size: 12px; color: #999; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -21,13 +23,14 @@
         
         <p class="info">Download the app to claim your <strong>KES 20 bonus</strong> after completing your first task!</p>
         
-        <a href="https://play.google.com/store/apps/details?id=com.writershub.app" class="button">
+        <a href="https://play.google.com/store/apps/details?id=com.writershub.app" class="button" id="downloadButton">
             📲 Download WritersHub
         </a>
         
         <p style="margin-top: 30px; font-size: 14px; color: #999;">
             Already have the app? <a href="#" id="openApp">Click here to open</a>
         </p>
+        <p class="note">If the app doesn't open, make sure it's installed and try again</p>
     </div>
 
 <script>
@@ -65,15 +68,47 @@
         console.log('Saved referral code:', referralCode);
     }
     
-    // Handle the "Open App" link
+    // Handle the "Open App" link - MULTIPLE METHODS FOR BETTER COMPATIBILITY
     document.getElementById('openApp').onclick = function(e) {
         e.preventDefault();
-        if (referralCode) {
-            window.location = 'intent://refer/' + referralCode + '#Intent;scheme=https;package=com.writershub.app;end';
-        } else {
+        
+        if (!referralCode) {
             alert('No referral code found');
+            return;
         }
+        
+        // Method 1: Custom scheme (works with our AndroidManifest.xml setup)
+        window.location = 'writershub://refer/' + referralCode;
+        
+        // Method 2: Intent fallback (Android)
+        setTimeout(function() {
+            window.location = 'intent://refer/' + referralCode + 
+                '#Intent;scheme=https;package=com.writershub.app;' +
+                'S.browser_fallback_url=https://shillah234.github.io/-writershub-landing;end';
+        }, 500);
+        
+        // Method 3: Market intent (if app not installed, goes to Play Store)
+        setTimeout(function() {
+            window.location = 'market://details?id=com.writershub.app';
+        }, 1000);
+        
+        return false;
     };
+    
+    // Auto-try to open app when page loads (if code exists)
+    if (referralCode) {
+        setTimeout(function() {
+            // Try custom scheme first
+            window.location = 'writershub://refer/' + referralCode;
+        }, 1000);
+    }
+    
+    // Update download button for testing (remove when app is on Play Store)
+    const downloadButton = document.getElementById('downloadButton');
+    if (downloadButton && !downloadButton.href.includes('play.google.com')) {
+        // For testing, you can set a different link here
+        console.log('Download button ready');
+    }
 </script>   
 </body>
 </html>
